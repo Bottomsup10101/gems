@@ -1,0 +1,14 @@
+%pip -q install diffusers transformers accelerate
+import torch
+from diffusers import StableDiffusionPipeline
+
+if not torch.cuda.is_available():
+    print("Enable a GPU in Runtime > Change runtime type for practical speed.")
+else:
+    model_id = "stable-diffusion-v1-5/stable-diffusion-v1-5"
+    pipe = StableDiffusionPipeline.from_pretrained(
+        model_id, torch_dtype=torch.float16, safety_checker=None
+    ).to("cuda")
+    prompt = "A small robot reading a book in a cozy library, digital illustration"
+    image = pipe(prompt, num_inference_steps=20, guidance_scale=7.0).images[0]
+    display(image)
