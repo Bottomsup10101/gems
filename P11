@@ -1,0 +1,18 @@
+from collections import Counter
+outputs = [
+    "The engineer solved the problem through careful testing.",
+    "The nurse provided patient and thoughtful care.",
+    "The engineer explained the design clearly.",
+    "The nurse analyzed the results carefully."
+]
+# Demonstration-only proxy; keyword counts do not establish real-world bias.
+terms = ["engineer", "nurse"]
+before = Counter(term for text in outputs for term in terms if term in text.lower())
+blocked_terms = {"stupid", "inferior", "incapable"}
+filtered = [text for text in outputs
+            if not any(term in text.lower() for term in blocked_terms)]
+after = Counter(term for text in filtered for term in terms if term in text.lower())
+print("Keyword counts before:", before)
+print("Keyword counts after:", after)
+print("Outputs retained:", len(filtered), "of", len(outputs))
+print("Note: This toy filter checks only explicit words and cannot detect subtle bias.")
