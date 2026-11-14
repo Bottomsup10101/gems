@@ -1,0 +1,23 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.DataFrame({
+    "length": [5, 8, 4, 10, 7, 6],
+    "score": [0.7, 0.9, 0.5, 0.95, 0.8, 0.75],
+    "tokens": [20, 35, 18, 42, 30, 25]
+})
+df["length"].hist()
+plt.title("Length Distribution")
+plt.xlabel("Length")
+plt.show()
+
+plt.scatter(df["length"], df["score"])
+plt.xlabel("Length")
+plt.ylabel("Score")
+plt.title("Length vs Score")
+plt.show()
+
+sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
+plt.title("Correlation Heatmap")
+plt.show()
