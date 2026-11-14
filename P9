@@ -1,0 +1,16 @@
+%pip -q install sentence-transformers faiss-cpu transformers
+import numpy as np
+import faiss
+from sentence_transformers import SentenceTransformer
+from transformers import pipeline
+
+documents = [
+    "TensorFlow is a framework for numerical computation and machine learning.",
+    "FAISS supports efficient similarity search over dense vectors.",
+    "RAG retrieves relevant documents and uses them to help generate an answer.",
+    "Word2Vec learns vector representations of words from their contexts."
+]
+embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+vectors = embedder.encode(documents, normalize_embeddings=True).astype("float32")
+index = faiss.IndexFlatIP(vectors.shape[1])
+index.add(vectors)
