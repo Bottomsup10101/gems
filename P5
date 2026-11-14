@@ -1,0 +1,16 @@
+%pip -q uninstall -y torchao
+%pip -q install --force-reinstall --upgrade diffusers transformers accelerate
+import torch
+from diffusers import DDPMPipeline
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model_id = "google/ddpm-cifar10-32"
+
+# Load the pre-trained model
+pipe = DDPMPipeline.from_pretrained(model_id).to(device)
+
+# Generate images
+images = pipe(batch_size=2, num_inference_steps=50).images
+
+# Display the images
+display(images[0])
+display(images[1])
