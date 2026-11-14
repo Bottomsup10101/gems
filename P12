@@ -1,0 +1,24 @@
+% import random
+random.seed(7)
+target = 10
+agents = {"Agent A": 0, "Agent B": 0}
+history = []
+
+for step in range(1, 11):
+    for name in agents:
+        action = random.choice([-1, 1, 2])
+        agents[name] = max(0, agents[name] + action)
+        if agents[name] >= target:
+            agents[name] = target
+        history.append((step, name, action, agents[name]))
+        if agents[name] == target:
+            break
+    if any(position == target for position in agents.values()):
+        break
+
+for row in history:
+    print(f"Step {row[0]} | {row[1]} | action={row[2]} | position={row[3]}")
+print("Final positions:", agents)
+winner = next((name for name, position in agents.items() if position == target), "No winner")
+print("Result:", winner)
+
