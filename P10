@@ -1,0 +1,19 @@
+%pip -q install transformers
+import time
+import torch
+from transformers import AutoTokenizer, AutoModel
+
+model_id = "distilbert/distilbert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model = AutoModel.from_pretrained(model_id).eval()
+quantized = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8).eval()
+inputs = tokenizer("A short sentence for inference speed testing.", return_tensors="pt")
+
+def benchmark(m, repeats=20):
+    with torch.no_grad():
+        for _ in range(3):
+            m(**inputs)
+        start = time.perf_counter()
+        for _ in range(repeats):
+            m(**inputs)
+    return (time.perf_counter() - start) / repeate
