@@ -1,3 +1,4 @@
+!pip install tensorflow
 import tensorflow as tf
 a = tf.constant([1, 2, 3])
 b = tf.constant([4, 5, 6])
@@ -6,9 +7,7 @@ print("Addition:", a + b)
 print("Element-wise multiplication:", a * b)
 print("Reshaped:", tf.reshape(a, (3, 1)))
 print("Eager execution:", tf.executing_eagerly())
-
 @tf.function
 def compute(x):
-    return x * x + 2
-
+  return x * x + 2
 print("Computation graph result:", compute(a))
