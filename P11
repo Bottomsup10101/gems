@@ -1,49 +1,120 @@
-# Step 1: Import Library 
-from collections import Counter 
-# Step 2: Sample AI-generated Outputs 
-outputs = [ 
- "The engineer solved the problem through careful testing.", 
- "The nurse provided patient and thoughtful care.", 
- "The engineer explained the design clearly.", 
- "The nurse analyzed the results carefully." 
-] 
-# Step 3: Define Keywords 
-terms = ["engineer", "nurse"] 
-# Step 4: Count Keywords Before Filtering 
-before = Counter( 
- term 
- for text in outputs 
- for term in terms 
- if term in text.lower() 
-) 
-# Step 5: Define Blocked Words 
-blocked_terms = {"stupid", "inferior", "incapable"} 
-# Step 6: Filter Biased or Blocked Words 
-filtered = [ 
- text for text in outputs 
- if not any( 
- term in text.lower() for term in blocked_terms 
- ) 
-] 
-# Step 7: Count Keywords After Filtering 
-after = Counter( 
- term 
- for text in filtered 
- for term in terms 
- if term in text.lower() 
-) 
-# Step 8: Display Results 
-print("Keyword counts before:", before) 
-print("Keyword counts after:", after) 
-print( 
- "Outputs retained:", 
- len(filtered), 
- "of", 
- len(outputs) 
-) 
-print("\nFiltered Outputs:") 
-for text in filtered: 
- print("-", text) 
-print( 
- "\nNote: This toy filter checks only explicit words " 
- "and cannot detect subtle bias." )
+
+# ==========================================
+# STEP 1: IMPORT LIBRARIES
+# ==========================================
+
+from collections import Counter
+
+
+# ==========================================
+# STEP 2: SAMPLE AI-GENERATED OUTPUTS
+# ==========================================
+
+outputs = [
+    "The engineer solved the problem through careful testing.",
+    "The nurse provided patient and thoughtful care.",
+    "The engineer explained the design clearly.",
+    "The nurse analyzed the results carefully."
+]
+
+
+# ==========================================
+# STEP 3: DEFINE KEYWORDS
+# ==========================================
+
+terms = ["engineer", "nurse"]
+
+
+# ==========================================
+# STEP 4: COUNT KEYWORDS BEFORE FILTERING
+# ==========================================
+
+before = Counter(
+    term
+    for text in outputs
+    for term in terms
+    if term in text.lower()
+)
+
+
+# ==========================================
+# STEP 5: DEFINE BLOCKED WORDS
+# ==========================================
+
+blocked_terms = {
+    "stupid",
+    "inferior",
+    "incapable"
+}
+
+
+# ==========================================
+# STEP 6: FILTER BIASED OR BLOCKED WORDS
+# ==========================================
+
+filtered = [
+    text
+    for text in outputs
+    if not any(
+        term in text.lower()
+        for term in blocked_terms
+    )
+]
+
+
+# ==========================================
+# STEP 7: COUNT KEYWORDS AFTER FILTERING
+# ==========================================
+
+after = Counter(
+    term
+    for text in filtered
+    for term in terms
+    if term in text.lower()
+)
+
+
+# ==========================================
+# STEP 8: DISPLAY RESULTS
+# ==========================================
+
+print("========== KEYWORD COUNTS ==========")
+
+print("Keyword counts before:", before)
+print("Keyword counts after:", after)
+
+print(
+    "Outputs retained:",
+    len(filtered),
+    "of",
+    len(outputs)
+)
+
+
+# ==========================================
+# STEP 9: DISPLAY FILTERED OUTPUTS
+# ==========================================
+
+print("\n========== FILTERED OUTPUTS ==========")
+
+for text in filtered:
+    print("-", text)
+
+
+# ==========================================
+# STEP 10: DISPLAY LIMITATION
+# ==========================================
+
+print(
+    "\nNote: This toy filter checks only explicit words "
+    "and cannot detect subtle bias."
+)
+
+
+# ==========================================
+# PROGRAM COMPLETED
+# ==========================================
+
+print("\n================================")
+print("BIAS FILTERING EXECUTED SUCCESSFULLY!")
+print("================================")
