@@ -1,75 +1,129 @@
-%pip install -q --upgrade --force-reinstall "transformers<5.0.0" 
-"tokenizers<0.21.0" "huggingface-hub<1.0.0" rouge-score sentencepiece 
-# Force Python to reload cached modules 
-import sys 
-for module in list(sys.modules.keys()): 
- if any(pkg in module for pkg in ["transformers", "tokenizers", "huggingface_hub"]): 
-  sys.modules.pop(module, None) 
-# ========================================== 
-# IMPORT LIBRARIES 
-# ========================================== 
-import torch 
-from transformers import pipeline from rouge_score import rouge_scorer 
-print("Libraries installed successfully!") 
-# ========================================== 
-# DEVICE CONFIGURATION 
-# ========================================== 
-device = 0 if torch.cuda.is_available() else -1 
-print("Device:", "GPU" if device == 0 else "CPU") 
-# ========================================== 
-# LOAD SUMMARIZATION MODEL 
-# ========================================== 
-print("Loading model... Please wait.") 
-summarizer = pipeline( 
- "summarization", 
- model="sshleifer/distilbart-cnn-12-6", 
- device=device 
-) 
-print("Model loaded successfully!") 
-# ========================================== 
-# INPUT ARTICLE 
-# ========================================== article = ( 
- "Generative AI systems learn patterns from data and can produce text, 
-images, " 
- "audio, and code. Their quality depends on data, model architecture, 
-and evaluation. " 
- "Responsible use also requires attention to privacy, bias, and factual 
-accuracy." 
-) 
-# Reference summary 
-reference = ( 
- "Generative AI creates content from learned data patterns. Quality 
-evaluation " 
- "should consider performance, privacy, bias, and factual accuracy." 
-) 
-# ========================================== 
-# GENERATE SUMMARY 
-# ========================================== 
-print("\nGenerating summary...") 
-summary = summarizer( 
- article, 
- max_length=45, 
- min_length=10, 
- do_sample=False 
-)[0]["summary_text"] 
-print("\n========== GENERATED SUMMARY ==========") 
-print(summary) # ========================================== 
-# ROUGE EVALUATION 
-# ========================================== 
-scorer = rouge_scorer.RougeScorer( 
- ["rouge1", "rougeL"], 
- use_stemmer=True 
-) 
-scores = scorer.score(reference, summary) 
-print("\n========== ROUGE SCORES ==========") 
-for metric, score in scores.items(): 
- print(f"\n{metric.upper()}") 
- print("Precision:", round(score.precision, 4)) 
- print("Recall:", round(score.recall, 4)) 
- print("F1 Score:", round(score.fmeasure, 4)) 
-# ========================================== 
-# COMPLETED 
-# ========================================== 
-print("\n================================") 
-print("PROGRAM EXECUTED SUCCESSFULLY!") 
+
+# ==========================================
+# INSTALL REQUIRED LIBRARIES
+# ==========================================
+
+%pip install -q --upgrade --force-reinstall \
+    "transformers<5.0.0" \
+    "tokenizers<0.21.0" \
+    "huggingface-hub<1.0.0" \
+    rouge-score \
+    sentencepiece
+
+
+# ==========================================
+# RELOAD CACHED MODULES
+# ==========================================
+
+import sys
+
+for module in list(sys.modules.keys()):
+    if any(pkg in module for pkg in [
+        "transformers",
+        "tokenizers",
+        "huggingface_hub"
+    ]):
+        sys.modules.pop(module, None)
+
+
+# ==========================================
+# IMPORT LIBRARIES
+# ==========================================
+
+import torch
+from transformers import pipeline
+from rouge_score import rouge_scorer
+
+print("Libraries installed successfully!")
+
+
+# ==========================================
+# DEVICE CONFIGURATION
+# ==========================================
+
+device = 0 if torch.cuda.is_available() else -1
+
+print("Device:", "GPU" if device == 0 else "CPU")
+
+
+# ==========================================
+# LOAD SUMMARIZATION MODEL
+# ==========================================
+
+print("Loading model... Please wait.")
+
+summarizer = pipeline(
+    "summarization",
+    model="sshleifer/distilbart-cnn-12-6",
+    device=device
+)
+
+print("Model loaded successfully!")
+
+
+# ==========================================
+# INPUT ARTICLE
+# ==========================================
+
+article = (
+    "Generative AI systems learn patterns from data and can produce text, "
+    "images, audio, and code. Their quality depends on data, model architecture, "
+    "and evaluation. Responsible use also requires attention to privacy, bias, "
+    "and factual accuracy."
+)
+
+
+# ==========================================
+# REFERENCE SUMMARY
+# ==========================================
+
+reference = (
+    "Generative AI creates content from learned data patterns. Quality evaluation "
+    "should consider performance, privacy, bias, and factual accuracy."
+)
+
+
+# ==========================================
+# GENERATE SUMMARY
+# ==========================================
+
+print("\nGenerating summary...")
+
+summary = summarizer(
+    article,
+    max_length=45,
+    min_length=10,
+    do_sample=False
+)[0]["summary_text"]
+
+print("\n========== GENERATED SUMMARY ==========")
+print(summary)
+
+
+# ==========================================
+# ROUGE EVALUATION
+# ==========================================
+
+scorer = rouge_scorer.RougeScorer(
+    ["rouge1", "rougeL"],
+    use_stemmer=True
+)
+
+scores = scorer.score(reference, summary)
+
+print("\n========== ROUGE SCORES ==========")
+
+for metric, score in scores.items():
+    print(f"\n{metric.upper()}")
+    print("Precision:", round(score.precision, 4))
+    print("Recall:", round(score.recall, 4))
+    print("F1 Score:", round(score.fmeasure, 4))
+
+
+# ==========================================
+# PROGRAM COMPLETED
+# ==========================================
+
+print("\n================================")
+print("PROGRAM EXECUTED SUCCESSFULLY!")
 print("================================")
