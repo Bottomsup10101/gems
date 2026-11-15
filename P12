@@ -1,24 +1,46 @@
-% import random
-random.seed(7)
-target = 10
-agents = {"Agent A": 0, "Agent B": 0}
-history = []
-
-for step in range(1, 11):
-    for name in agents:
-        action = random.choice([-1, 1, 2])
-        agents[name] = max(0, agents[name] + action)
-        if agents[name] >= target:
-            agents[name] = target
-        history.append((step, name, action, agents[name]))
-        if agents[name] == target:
-            break
-    if any(position == target for position in agents.values()):
-        break
-
-for row in history:
-    print(f"Step {row[0]} | {row[1]} | action={row[2]} | position={row[3]}")
-print("Final positions:", agents)
-winner = next((name for name, position in agents.items() if position == target), "No winner")
+# Step 1: Import Library 
+import random 
+# Step 2: Set Random Seed 
+random.seed(7) 
+# Step 3: Define Target 
+target = 10 
+# Step 4: Initialize Agents 
+agents = { 
+ "Agent A": 0, 
+ "Agent B": 0 
+} 
+history = [] 
+# Step 5: Run Multi-Agent Simulation for step in range(1, 11): 
+ for name in agents: 
+ # Random action 
+ action = random.choice([-1, 1, 2]) 
+ # Update agent position 
+ agents[name] = max(0, agents[name] + action) 
+ if agents[name] >= target: 
+ agents[name] = target 
+ # Store history 
+ history.append( 
+ (step, name, action, agents[name]) 
+ ) 
+ # Check winner 
+ if agents[name] == target: 
+ break 
+ if any(position == target for position in agents.values()): 
+ break 
+# Step 6: Display Simulation History 
+print("SIMULATION HISTORY") 
+for row in history: 
+ print( f"Step {row[0]} | {row[1]} | " 
+ f"action={row[2]} | position={row[3]}" 
+ ) 
+# Step 7: Display Final Positions 
+print("\nFinal positions:", agents) 
+# Step 8: Declare Winner 
+winner = next( 
+ ( 
+ name for name, position in agents.items() 
+ if position == target 
+ ), 
+ "No winner" 
+) 
 print("Result:", winner)
-
