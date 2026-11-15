@@ -1,46 +1,111 @@
-# Step 1: Import Library 
-import random 
-# Step 2: Set Random Seed 
-random.seed(7) 
-# Step 3: Define Target 
-target = 10 
-# Step 4: Initialize Agents 
-agents = { 
- "Agent A": 0, 
- "Agent B": 0 
-} 
-history = [] 
-# Step 5: Run Multi-Agent Simulation for step in range(1, 11): 
- for name in agents: 
- # Random action 
- action = random.choice([-1, 1, 2]) 
- # Update agent position 
- agents[name] = max(0, agents[name] + action) 
- if agents[name] >= target: 
- agents[name] = target 
- # Store history 
- history.append( 
- (step, name, action, agents[name]) 
- ) 
- # Check winner 
- if agents[name] == target: 
- break 
- if any(position == target for position in agents.values()): 
- break 
-# Step 6: Display Simulation History 
-print("SIMULATION HISTORY") 
-for row in history: 
- print( f"Step {row[0]} | {row[1]} | " 
- f"action={row[2]} | position={row[3]}" 
- ) 
-# Step 7: Display Final Positions 
-print("\nFinal positions:", agents) 
-# Step 8: Declare Winner 
-winner = next( 
- ( 
- name for name, position in agents.items() 
- if position == target 
- ), 
- "No winner" 
-) 
-print("Result:", winner)
+
+# ==========================================
+# STEP 1: IMPORT LIBRARIES
+# ==========================================
+
+import random
+
+
+# ==========================================
+# STEP 2: SET RANDOM SEED
+# ==========================================
+
+random.seed(7)
+
+
+# ==========================================
+# STEP 3: DEFINE TARGET
+# ==========================================
+
+target = 10
+
+
+# ==========================================
+# STEP 4: INITIALIZE AGENTS
+# ==========================================
+
+agents = {
+    "Agent A": 0,
+    "Agent B": 0
+}
+
+history = []
+
+
+# ==========================================
+# STEP 5: RUN MULTI-AGENT SIMULATION
+# ==========================================
+
+for step in range(1, 11):
+
+    for name in agents:
+
+        # Generate random action
+        action = random.choice([-1, 1, 2])
+
+        # Update agent position
+        agents[name] = max(0, agents[name] + action)
+
+        # Ensure position does not exceed target
+        if agents[name] >= target:
+            agents[name] = target
+
+        # Store simulation history
+        history.append(
+            (step, name, action, agents[name])
+        )
+
+        # Check if agent has reached the target
+        if agents[name] == target:
+            break
+
+    # Stop simulation if any agent wins
+    if any(position == target for position in agents.values()):
+        break
+
+
+# ==========================================
+# STEP 6: DISPLAY SIMULATION HISTORY
+# ==========================================
+
+print("========== SIMULATION HISTORY ==========")
+
+for row in history:
+    print(
+        f"Step {row[0]} | {row[1]} | "
+        f"action={row[2]} | position={row[3]}"
+    )
+
+
+# ==========================================
+# STEP 7: DISPLAY FINAL POSITIONS
+# ==========================================
+
+print("\n========== FINAL POSITIONS ==========")
+
+print("Final positions:", agents)
+
+
+# ==========================================
+# STEP 8: DECLARE WINNER
+# ==========================================
+
+winner = next(
+    (
+        name
+        for name, position in agents.items()
+        if position == target
+    ),
+    "No winner"
+)
+
+print("\nResult:", winner)
+
+
+# ==========================================
+# PROGRAM COMPLETED
+# ==========================================
+
+print("\n================================")
+print("MULTI-AGENT SIMULATION COMPLETED!")
+print("================================")
