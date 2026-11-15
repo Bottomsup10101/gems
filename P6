@@ -1,14 +1,37 @@
-%pip -q install diffusers transformers accelerate
-import torch
-from diffusers import StableDiffusionPipeline
-
-if not torch.cuda.is_available():
-    print("Enable a GPU in Runtime > Change runtime type for practical speed.")
-else:
-    model_id = "stable-diffusion-v1-5/stable-diffusion-v1-5"
-    pipe = StableDiffusionPipeline.from_pretrained(
-        model_id, torch_dtype=torch.float16, safety_checker=None
-    ).to("cuda")
-    prompt = "A small robot reading a book in a cozy library, digital illustration"
-    image = pipe(prompt, num_inference_steps=20, guidance_scale=7.0).images[0]
-    display(image)
+# Install libraries 
+%pip install -q -U diffusers transformers accelerate safetensors 
+# Import libraries 
+import torch 
+from diffusers import StableDiffusionPipeline 
+from IPython.display import display 
+# Device configuraƟon
+device = "cuda" if torch.cuda.is_available() else "cpu" 
+dtype = torch.float16 if device == "cuda" else torch.float32 
+print("Running on:", device) # Load Stable Diffusion 1.5 
+model_id = "stable-diffusion-v1-5/stable-diffusion-v1-5" 
+pipe = StableDiffusionPipeline.from_pretrained( 
+ model_id, 
+ torch_dtype=dtype, 
+ use_safetensors=True 
+) 
+pipe = pipe.to(device) 
+# OpƟmize GPU memory
+if device == "cuda": 
+ pipe.enable_aƩenƟon_slicing()
+# Image prompt 
+prompt = "A small cute robot reading a book in a cozy library, digital illustraƟon, 
+cinemaƟc lighƟng, highly detailed, 4K"
+# Generate image 
+print("GeneraƟng image... Please wait.")
+with torch.inference_mode(): image = pipe( 
+ prompt=prompt, 
+ num_inference_steps=20, 
+ guidance_scale=7.0, 
+ width=512, 
+ height=512 
+ ).images[0] 
+# Display image 
+display(image) 
+# Save image 
+image.save("generated_robot.png") 
+print("SUCCESS! Image generated and saved as generated_robot.png")
