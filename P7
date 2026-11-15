@@ -1,13 +1,11 @@
 # Force clean install of compatible library versions 
-%pip install -q --upgrade --force-reinstall transformers datasets peft 
-accelerate torchao huggingface-hub 
+%pip install -q --upgrade --force-reinstall transformers datasets peft accelerate torchao huggingface-hub 
 # Safely clear the python import cache to avoid trainer and hub import 
 conflicts 
 import sys 
 for module in list(sys.modules.keys()): 
- if any(pkg in module for pkg in ["transformers", "peft", 
-"huggingface_hub"]): 
- sys.modules.pop(module, None) 
+ if any(pkg in module for pkg in ["transformers", "peft", "huggingface_hub"]): 
+  sys.modules.pop(module, None) 
 # Import libraries 
 import torch 
 from datasets import Dataset 
@@ -34,15 +32,15 @@ tokenizer.pad_token = tokenizer.eos_token
 dataset = Dataset.from_dict({"text": texts}) 
 # Tokenize dataset 
 def tokenize(batch): 
- return tokenizer( 
- batch["text"], 
+ return tokenizer( batch["text"], 
  truncation=True, 
  max_length=64 
- ) tokenized = dataset.map( 
+ ) 
+ tokenized = dataset.map( 
  tokenize, 
  batched=True, 
  remove_columns=["text"] 
-) 
+ ) 
 # Load model 
 model = AutoModelForCausalLM.from_pretrained(model_id) 
 model.config.pad_token_id = tokenizer.pad_token_id 
@@ -85,7 +83,8 @@ print("Training started...")
 trainer.train() 
 print("Training completed successfully!") 
 # Generate text 
-prompt = "Generative AI" inputs = tokenizer( 
+prompt = "Generative AI" 
+inputs = tokenizer( 
  prompt, 
  return_tensors="pt" 
 ).to(model.device) 
