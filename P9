@@ -1,62 +1,152 @@
-# Step 1: Install Libraries 
-!pip -q install sentence-transformers faiss-cpu transformers 
-# Step 2: Import Libraries 
-import numpy as np 
-import faiss 
-from sentence_transformers import SentenceTransformer 
-from transformers import pipeline 
-# Step 3: Create Documents 
-documents = [ 
- "TensorFlow is a framework for numerical computation and machine 
-learning.", 
- "FAISS supports efficient similarity search over dense vectors.", 
- "RAG retrieves relevant documents and uses them to help generate an 
-answer.", 
- "Word2Vec learns vector representations of words from their contexts." 
-] # Step 4: Load Embedding Model 
-embedder = SentenceTransformer( 
- "sentence-transformers/all-MiniLM-L6-v2" 
-) 
-# Step 5: Generate Embeddings 
-vectors = embedder.encode( 
- documents, 
- normalize_embeddings=True 
-).astype("float32") 
-# Step 6: Create FAISS Index 
-index = faiss.IndexFlatIP(vectors.shape[1]) 
-index.add(vectors) 
-print("Documents successfully stored in FAISS!") 
-print("Total documents:", index.ntotal) 
-# Step 7: Load Text Generation Model 
-generator = pipeline( 
- "text2text-generation", 
- model="google/flan-t5-small" 
-) 
-# Step 8: Search Query 
-query = "What is FAISS and how does it work?" 
-query_vector = embedder.encode( 
- [query], 
- normalize_embeddings=True ).astype("float32") 
-# Step 9: Retrieve Relevant Documents 
-scores, indices = index.search(query_vector, k=2) 
-retrieved_docs = [ 
- documents[i] for i in indices[0] 
-] 
-print("\nRetrieved Documents:") 
-for doc in retrieved_docs: 
- print("-", doc) 
-# Step 10: Generate Answer Using RAG 
-context = "\n".join(retrieved_docs) 
-prompt = f""" 
-Answer the question using only the context below. 
-Context: 
-{context} 
-Question: 
-{query} 
-Answer: 
-""" 
-result = generator( 
- prompt, max_new_tokens=100 
-) 
-print("\nGenerated Answer:") 
+
+# ==========================================
+# STEP 1: INSTALL REQUIRED LIBRARIES
+# ==========================================
+
+!pip -q install sentence-transformers faiss-cpu transformers
+
+
+# ==========================================
+# STEP 2: IMPORT LIBRARIES
+# ==========================================
+
+import numpy as np
+import faiss
+
+from sentence_transformers import SentenceTransformer
+from transformers import pipeline
+
+
+# ==========================================
+# STEP 3: CREATE DOCUMENTS
+# ==========================================
+
+documents = [
+    "TensorFlow is a framework for numerical computation and machine learning.",
+    "FAISS supports efficient similarity search over dense vectors.",
+    "RAG retrieves relevant documents and uses them to help generate an answer.",
+    "Word2Vec learns vector representations of words from their contexts."
+]
+
+
+# ==========================================
+# STEP 4: LOAD EMBEDDING MODEL
+# ==========================================
+
+print("Loading embedding model...")
+
+embedder = SentenceTransformer(
+    "sentence-transformers/all-MiniLM-L6-v2"
+)
+
+print("Embedding model loaded successfully!")
+
+
+# ==========================================
+# STEP 5: GENERATE DOCUMENT EMBEDDINGS
+# ==========================================
+
+vectors = embedder.encode(
+    documents,
+    normalize_embeddings=True
+).astype("float32")
+
+
+# ==========================================
+# STEP 6: CREATE FAISS INDEX
+# ==========================================
+
+index = faiss.IndexFlatIP(vectors.shape[1])
+
+index.add(vectors)
+
+print("Documents successfully stored in FAISS!")
+print("Total documents:", index.ntotal)
+
+
+# ==========================================
+# STEP 7: LOAD TEXT GENERATION MODEL
+# ==========================================
+
+print("Loading text generation model...")
+
+generator = pipeline(
+    "text2text-generation",
+    model="google/flan-t5-small"
+)
+
+print("Text generation model loaded successfully!")
+
+
+# ==========================================
+# STEP 8: DEFINE SEARCH QUERY
+# ==========================================
+
+query = "What is FAISS and how does it work?"
+
+query_vector = embedder.encode(
+    [query],
+    normalize_embeddings=True
+).astype("float32")
+
+
+# ==========================================
+# STEP 9: RETRIEVE RELEVANT DOCUMENTS
+# ==========================================
+
+scores, indices = index.search(
+    query_vector,
+    k=2
+)
+
+retrieved_docs = [
+    documents[i] for i in indices[0]
+    if i != -1
+]
+
+print("\n========== RETRIEVED DOCUMENTS ==========")
+
+for doc in retrieved_docs:
+    print("-", doc)
+
+
+# ==========================================
+# STEP 10: GENERATE ANSWER USING RAG
+# ==========================================
+
+context = "\n".join(retrieved_docs)
+
+prompt = f"""
+Answer the question using only the context below.
+
+Context:
+{context}
+
+Question:
+{query}
+
+Answer:
+"""
+
+result = generator(
+    prompt,
+    max_new_tokens=100
+)
+
+
+# ==========================================
+# STEP 11: DISPLAY GENERATED ANSWER
+# ==========================================
+
+print("\n========== GENERATED ANSWER ==========")
+
 print(result[0]["generated_text"])
+
+
+# ==========================================
+# PROGRAM COMPLETED
+# ==========================================
+
+print("\n================================")
+print("RAG PROGRAM EXECUTED SUCCESSFULLY!")
+print("================================")
