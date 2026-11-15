@@ -1,41 +1,106 @@
-%pip -q install transformers datasets peft accelerate
-import torch
-from datasets import Dataset
-from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer, DataCollatorForLanguageModeling
-from peft import LoraConfig, get_peft_model, TaskType
-
-model_id = "distilgpt2"
-texts = [
-    "Generative AI creates new text, images, and other content.",
-    "Transformers learn relationships between tokens using attention.",
-    "Machine learning models improve by learning patterns from data.",
-    "Retrieval augmented generation uses documents to ground answers."
-] * 8
-
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-tokenizer.pad_token = tokenizer.eos_token
-dataset = Dataset.from_dict({"text": texts})
-def tokenize(batch):
-    return tokenizer(batch["text"], truncation=True, max_length=64)
-tokenized = dataset.map(tokenize, batched=True, remove_columns=["text"])
-
-model = AutoModelForCausalLM.from_pretrained(model_id)
-model.config.pad_token_id = tokenizer.pad_token_id
-model = get_peft_model(model, LoraConfig(
-    task_type=TaskType.CAUSAL_LM, r=4, lora_alpha=8, lora_dropout=0.05,
-    target_modules=["c_attn"]
-))
-args = TrainingArguments(
-    output_dir="/content/lora-distilgpt2", num_train_epochs=1,
-    per_device_train_batch_size=2, logging_steps=5, report_to="none",
-    save_strategy="no", fp16=torch.cuda.is_available()
-)
-trainer = Trainer(model=model, args=args, train_dataset=tokenized,
-                  data_collator=DataCollatorForLanguageModeling(tokenizer, mlm=False))
-trainer.train()
-
-prompt = "Generative AI"
-inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-output = model.generate(**inputs, max_new_tokens=40, do_sample=True, temperature=0.8,
-                         pad_token_id=tokenizer.eos_token_id)
-print(tokenizer.decode(output[0], skip_special_tokens=True))
+# Force clean install of compatible library versions 
+%pip install -q --upgrade --force-reinstall transformers datasets peft 
+accelerate torchao huggingface-hub 
+# Safely clear the python import cache to avoid trainer and hub import 
+conflicts 
+import sys 
+for module in list(sys.modules.keys()): 
+ if any(pkg in module for pkg in ["transformers", "peft", 
+"huggingface_hub"]): 
+ sys.modules.pop(module, None) 
+# Import libraries 
+import torch 
+from datasets import Dataset 
+from transformers import ( 
+ AutoTokenizer, 
+ AutoModelForCausalLM, 
+ TrainingArguments, 
+ Trainer, DataCollatorForLanguageModeling 
+) 
+from peft import LoraConfig, get_peft_model, TaskType 
+# Select model 
+model_id = "distilgpt2" 
+# Training data 
+texts = [ 
+ "Generative AI creates new text, images, and other content.", 
+ "Transformers learn relationships between tokens using attention.", 
+ "Machine learning models improve by learning patterns from data.", 
+ "Retrieval augmented generation uses documents to ground answers." 
+] * 8 
+# Load tokenizer 
+tokenizer = AutoTokenizer.from_pretrained(model_id) 
+tokenizer.pad_token = tokenizer.eos_token 
+# Create dataset 
+dataset = Dataset.from_dict({"text": texts}) 
+# Tokenize dataset 
+def tokenize(batch): 
+ return tokenizer( 
+ batch["text"], 
+ truncation=True, 
+ max_length=64 
+ ) tokenized = dataset.map( 
+ tokenize, 
+ batched=True, 
+ remove_columns=["text"] 
+) 
+# Load model 
+model = AutoModelForCausalLM.from_pretrained(model_id) 
+model.config.pad_token_id = tokenizer.pad_token_id 
+# Configure LoRA 
+peft_config = LoraConfig( 
+ task_type=TaskType.CAUSAL_LM, 
+ r=4, 
+ lora_alpha=8, 
+ lora_dropout=0.05, 
+ target_modules=["c_attn"] 
+) 
+model = get_peft_model(model, peft_config) 
+model.print_trainable_parameters() 
+# Enable gradient checkpointing support 
+if torch.cuda.is_available(): 
+ model.enable_input_require_grads() 
+# Training configuration 
+args = TrainingArguments( 
+ output_dir="/content/lora-distilgpt2", 
+ num_train_epochs=1, per_device_train_batch_size=2, 
+ logging_steps=5, 
+ report_to="none", 
+ save_strategy="no", 
+ fp16=torch.cuda.is_available() 
+) 
+# Data collator 
+data_collator = DataCollatorForLanguageModeling( 
+ tokenizer=tokenizer, 
+ mlm=False 
+) 
+# Initialize trainer 
+trainer = Trainer( 
+ model=model, 
+ args=args, 
+ train_dataset=tokenized, 
+ data_collator=data_collator 
+) 
+# Start training 
+print("Training started...") 
+trainer.train() 
+print("Training completed successfully!") 
+# Generate text 
+prompt = "Generative AI" inputs = tokenizer( 
+ prompt, 
+ return_tensors="pt" 
+).to(model.device) 
+with torch.no_grad(): 
+ output = model.generate( 
+ **inputs, 
+ max_new_tokens=40, 
+ do_sample=True, 
+ temperature=0.8, 
+ pad_token_id=tokenizer.eos_token_id 
+ ) 
+# Display generated text 
+print("\nGenerated Text:") 
+print(tokenizer.decode(output[0], skip_special_tokens=True)) 
+# Save LoRA model 
+model.save_pretrained("/content/lora-distilgpt2") 
+tokenizer.save_pretrained("/content/lora-distilgpt2") 
+print("\nLoRA model saved successfully!")
