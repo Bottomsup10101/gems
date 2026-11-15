@@ -1,43 +1,131 @@
-# Step 1: Install Transformers 
-!pip -q install transformers 
-# Step 2: Import Libraries 
-import time 
-import torch 
-from transformers import AutoTokenizer, AutoModel 
-# Step 3: Load DistilBERT Model 
-model_id = "distilbert/distilbert-base-uncased" 
-tokenizer = AutoTokenizer.from_pretrained(model_id) 
-model = AutoModel.from_pretrained(model_id).eval() # Step 4: Apply Dynamic Quantization 
-quantized = torch.quantization.quantize_dynamic( 
- model, 
- {torch.nn.Linear}, 
- dtype=torch.qint8 
-).eval() 
-# Step 5: Prepare Input 
-inputs = tokenizer( 
- "A short sentence for inference speed testing.", 
- return_tensors="pt" 
-) 
-# Step 6: Benchmark Function 
-def benchmark(m, repeats=20): 
- with torch.no_grad(): 
- # Warm-up 
- for _ in range(3): 
- m(**inputs) 
- # Measure execution time 
- start = time.perf_counter() 
- for _ in range(repeats): 
- m(**inputs) 
- end = time.perf_counter() return (end - start) / repeats 
-# Step 7: Benchmark Original Model 
-original_time = benchmark(model) 
-# Step 8: Benchmark Quantized Model 
-quantized_time = benchmark(quantized) 
-# Step 9: Display Results 
-print("Original Model Inference Time:", 
- round(original_time * 1000, 3), "ms") 
-print("Quantized Model Inference Time:", 
- round(quantized_time * 1000, 3), "ms") 
-speedup = original_time / quantized_time 
-print("Speedup:", 
- round(speedup, 2), "x")
+
+# ==========================================
+# STEP 1: INSTALL TRANSFORMERS
+# ==========================================
+
+!pip -q install transformers
+
+
+# ==========================================
+# STEP 2: IMPORT LIBRARIES
+# ==========================================
+
+import time
+import torch
+
+from transformers import AutoTokenizer, AutoModel
+
+
+# ==========================================
+# STEP 3: LOAD DISTILBERT MODEL
+# ==========================================
+
+model_id = "distilbert/distilbert-base-uncased"
+
+print("Loading DistilBERT model...")
+
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+
+model = AutoModel.from_pretrained(model_id).eval()
+
+print("Model loaded successfully!")
+
+
+# ==========================================
+# STEP 4: APPLY DYNAMIC QUANTIZATION
+# ==========================================
+
+quantized = torch.quantization.quantize_dynamic(
+    model,
+    {torch.nn.Linear},
+    dtype=torch.qint8
+).eval()
+
+print("Dynamic quantization applied successfully!")
+
+
+# ==========================================
+# STEP 5: PREPARE INPUT
+# ==========================================
+
+inputs = tokenizer(
+    "A short sentence for inference speed testing.",
+    return_tensors="pt"
+)
+
+
+# ==========================================
+# STEP 6: DEFINE BENCHMARK FUNCTION
+# ==========================================
+
+def benchmark(m, repeats=20):
+
+    with torch.no_grad():
+
+        # Warm-up
+        for _ in range(3):
+            m(**inputs)
+
+        # Measure execution time
+        start = time.perf_counter()
+
+        for _ in range(repeats):
+            m(**inputs)
+
+        end = time.perf_counter()
+
+    return (end - start) / repeats
+
+
+# ==========================================
+# STEP 7: BENCHMARK ORIGINAL MODEL
+# ==========================================
+
+print("\nBenchmarking original model...")
+
+original_time = benchmark(model)
+
+
+# ==========================================
+# STEP 8: BENCHMARK QUANTIZED MODEL
+# ==========================================
+
+print("Benchmarking quantized model...")
+
+quantized_time = benchmark(quantized)
+
+
+# ==========================================
+# STEP 9: DISPLAY RESULTS
+# ==========================================
+
+print("\n========== INFERENCE BENCHMARK RESULTS ==========")
+
+print(
+    "Original Model Inference Time:",
+    round(original_time * 1000, 3),
+    "ms"
+)
+
+print(
+    "Quantized Model Inference Time:",
+    round(quantized_time * 1000, 3),
+    "ms"
+)
+
+speedup = original_time / quantized_time
+
+print(
+    "Speedup:",
+    round(speedup, 2),
+    "x"
+)
+
+
+# ==========================================
+# PROGRAM COMPLETED
+# ==========================================
+
+print("\n================================")
+print("BENCHMARK EXECUTED SUCCESSFULLY!")
+print("================================")
