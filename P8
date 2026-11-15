@@ -3,9 +3,8 @@
 # Force Python to reload cached modules 
 import sys 
 for module in list(sys.modules.keys()): 
- if any(pkg in module for pkg in ["transformers", "tokenizers", 
-"huggingface_hub"]): 
- sys.modules.pop(module, None) 
+ if any(pkg in module for pkg in ["transformers", "tokenizers", "huggingface_hub"]): 
+  sys.modules.pop(module, None) 
 # ========================================== 
 # IMPORT LIBRARIES 
 # ========================================== 
