@@ -1,20 +1,57 @@
+# Install libraries
 %pip -q install gensim faiss-cpu
+
+# Import libraries
 from gensim.models import Word2Vec
 import numpy as np
 import faiss
+
+# Training sentences
 sentences = [
-  ["cat", "likes", "milk"], ["dog", "likes", "meat"],
-  ["cat", "and", "dog", "are", "animals"],
-  ["king", "and", "queen", "rule"], ["queen", "is", "royal"]
+    ["cat", "likes", "milk"],
+    ["dog", "likes", "meat"],
+    ["cat", "and", "dog", "are", "animals"],
+    ["king", "and", "queen", "rule"],
+    ["queen", "is", "royal"]
 ]
-model = Word2Vec(sentences, vector_size=50, window=3, min_count=1,
-workers=1, epochs=100)
+
+# Train Word2Vec model
+model = Word2Vec(
+    sentences,
+    vector_size=50,
+    window=3,
+    min_count=1,
+    workers=1,
+    epochs=100
+)
+
+# Get words and their vectors
 words = list(model.wv.index_to_key)
-vectors = np.array([model.wv[w] for w in words], dtype="float32")
+
+vectors = np.array(
+    [model.wv[w] for w in words],
+    dtype="float32"
+)
+
+# Normalize vectors
 faiss.normalize_L2(vectors)
+
+# Create FAISS index
 index = faiss.IndexFlatIP(vectors.shape[1])
 index.add(vectors)
+
+# Search similar words
 query = "cat"
+
 q = model.wv[query].astype("float32").reshape(1, -1)
 faiss.normalize_L2(q)
-print(words[i], round(float(score), 3))
+
+# Find top 3 similar words
+scores, indices = index.search(q, 3)
+
+# Display results
+print("Query word:", query)
+print("Similar words:")
+
+for score, i in zip(scores[0], indices[0]):
+    print(words[i], round(float(score), 3))
