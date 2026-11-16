@@ -1,5 +1,9 @@
-%pip -q install transformers rouge-score
-
+%pip install -q --upgrade --force-reinstall \
+    "transformers<5.0.0" \
+    "tokenizers<0.21.0" \
+    "huggingface-hub<1.0.0" \
+    rouge-score \
+    sentencepiece
 from transformers import pipeline
 from rouge_score import rouge_scorer
 
