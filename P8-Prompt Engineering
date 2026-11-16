@@ -1,0 +1,43 @@
+%pip -q install transformers rouge-score
+
+from transformers import pipeline
+from rouge_score import rouge_scorer
+
+# Load the pretrained summarization model
+summarizer = pipeline(
+    "summarization",
+    model="sshleifer/distilbart-cnn-12-6"
+)
+
+# Input article
+article = (
+    "Generative AI systems learn patterns from data and can produce text, images, "
+    "audio, and code. Their quality depends on data, model architecture, and evaluation. "
+    "Responsible use also requires attention to privacy, bias, and factual accuracy."
+)
+
+# Reference summary
+reference = (
+    "Generative AI creates content from learned data patterns. Quality evaluation "
+    "should consider performance, privacy, bias, and factual accuracy."
+)
+
+# Generate summary
+summary = summarizer(
+    article,
+    max_length=45,
+    min_length=10,
+    do_sample=False
+)[0]["summary_text"]
+
+print("Summary:", summary)
+
+# Evaluate using ROUGE
+scorer = rouge_scorer.RougeScorer(
+    ["rouge1", "rougeL"],
+    use_stemmer=True
+)
+
+scores = scorer.score(reference, summary)
+
+print("ROUGE Scores:", scores)
