@@ -1,0 +1,48 @@
+
+%pip -q install -U diffusers transformers accelerate safetensors
+
+import torch
+from diffusers import StableDiffusionPipeline
+from IPython.display import display
+import gc
+
+# 1. Automatically select device
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+# 2. Select appropriate precision
+dtype = torch.float16 if device == "cuda" else torch.float32
+
+print(f"Running on: {device}")
+print(f"Precision: {dtype}")
+
+# 3. Load model
+model_id = "stable-diffusion-v1-5/stable-diffusion-v1-5"
+
+pipe = StableDiffusionPipeline.from_pretrained(
+    model_id,
+    torch_dtype=dtype,
+    use_safetensors=True
+)
+
+pipe = pipe.to(device)
+
+# 4. Memory optimization
+pipe.enable_attention_slicing()
+
+# 5. Generate image
+prompt = "A small robot reading a book in a cozy library, digital illustration"
+
+with torch.inference_mode():
+    image = pipe(
+        prompt,
+        num_inference_steps=20,
+        guidance_scale=7.0,
+        height=512,
+        width=512
+    ).images[0]
+
+# 6. Display and save
+display(image)
+image.save("generated_image.png")
+
+print("Image generated successfully!")
