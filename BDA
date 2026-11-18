@@ -1,0 +1,51 @@
+!pip install pandas numpy matplotlib seaborn scikit-learn
+
+
+# 1. Import libraries
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+# 2. Load the dataset (Real-life problem: Identifying flower species)
+data = load_iris()
+X = data.data    # 4 Features: Sepal Length, Sepal Width, Petal Length, Petal Width
+y = data.target  # Target: 0 (Setosa), 1 (Versicolor), 2 (Virginica)
+
+# 3. Split data (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Initialize models
+model_1 = LogisticRegression(max_iter=200)
+model_2 = DecisionTreeClassifier(random_state=42)
+
+# 5. Train both models
+model_1.fit(X_train, y_train)
+model_2.fit(X_train, y_train)
+
+# 6. Make predictions on test data
+y_pred_1 = model_1.predict(X_test)
+y_pred_2 = model_2.predict(X_test)
+
+# 7. Print Accuracy
+print("--- Model 1: Logistic Regression ---")
+print(f"Accuracy: {accuracy_score(y_test, y_pred_1) * 100:.2f}%\n")
+
+print("--- Model 2: Decision Tree ---")
+print(f"Accuracy: {accuracy_score(y_test, y_pred_2) * 100:.2f}%\n")
+
+# 8. THE SHOWCASE: Predict on a new, custom flower
+# Let's say we found a flower and measured it: 
+# Sepal Length: 5.1, Sepal Width: 3.5, Petal Length: 1.4, Petal Width: 0.2
+new_flower = [[5.1, 3.5, 1.4, 0.2]]
+
+# Predict using the Decision Tree model
+prediction = model_2.predict(new_flower)
+
+# Get the actual string name of the flower instead of just a number (0, 1, or 2)
+flower_name = data.target_names[prediction[0]]
+
+print("--- Live Custom Prediction ---")
+print(f"Measurements provided: {new_flower[0]}")
+print(f"The model predicts this flower is a: {flower_name.upper()}")
